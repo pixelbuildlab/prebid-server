@@ -1,0 +1,100 @@
+{
+  "mockBidRequest": {
+    "id": "test-request-id",
+    "imp": [
+      {
+        "id": "test-imp-id",
+        "video": {
+          "mimes": ["video/mp4"],
+          "minduration": 5,
+          "maxduration": 30,
+          "protocols": [1, 2, 5],
+          "w": 640,
+          "h": 480
+        },
+        "ext": {
+          "bidder": {}
+        }
+      }
+    ],
+    "site": {
+      "page": "https://example.com/page"
+    }
+  },
+  "httpCalls": [
+    {
+      "expectedRequest": {
+        "uri": "http://rtb.xenrtb.com/?pid=7d7a1a086cfa5105a4bdee1bb73f90ac",
+        "body": {
+          "id": "test-request-id",
+          "imp": [
+            {
+              "id": "test-imp-id",
+              "video": {
+                "mimes": ["video/mp4"],
+                "minduration": 5,
+                "maxduration": 30,
+                "protocols": [1, 2, 5],
+                "w": 640,
+                "h": 480
+              },
+              "ext": {
+                "bidder": {}
+              }
+            }
+          ],
+          "site": {
+            "page": "https://example.com/page"
+          }
+        },
+        "impIDs": ["test-imp-id"]
+      },
+      "mockResponse": {
+        "status": 200,
+        "body": {
+          "id": "test-request-id",
+          "cur": "USD",
+          "seatbid": [
+            {
+              "bid": [
+                {
+                  "id": "test-bid-id",
+                  "impid": "test-imp-id",
+                  "price": 2.50,
+                  "adm": "<VAST><Ad></Ad></VAST>",
+                  "adomain": ["example.com"],
+                  "crid": "test-creative-id",
+                  "w": 640,
+                  "h": 480,
+                  "mtype": 2
+                }
+              ],
+              "seat": "pubvive"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expectedBidResponses": [
+    {
+      "currency": "USD",
+      "bids": [
+        {
+          "bid": {
+            "id": "test-bid-id",
+            "impid": "test-imp-id",
+            "price": 2.50,
+            "adm": "<VAST><Ad></Ad></VAST>",
+            "adomain": ["example.com"],
+            "crid": "test-creative-id",
+            "w": 640,
+            "h": 480,
+            "mtype": 2
+          },
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}

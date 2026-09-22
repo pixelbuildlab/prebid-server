@@ -1,0 +1,11 @@
+endpoint: "http://rtb.xenrtb.com/?pid=9d203cb398882b94a15db0aaf0c08470"
+extra_info: '{"video_endpoint":"http://rtb.xenrtb.com/?pid=7d7a1a086cfa5105a4bdee1bb73f90ac"}'
+maintainer:
+  email: prebid@pubvive.com
+openrtb:
+  version: 2.6
+capabilities:
+  site:
+    mediaTypes:
+      - banner
+      - video
