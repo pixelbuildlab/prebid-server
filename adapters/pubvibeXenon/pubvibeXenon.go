@@ -1,4 +1,4 @@
-package pubvive
+package pubvibeXenon
 
 import (
 	"encoding/json"
@@ -23,14 +23,14 @@ type adapter struct {
 	videoEndpoint  string
 }
 
-// Builder creates a new pubvive adapter.
+// Builder creates a new pubvibeXenon adapter.
 // config.Adapter.Endpoint        → banner endpoint
 // config.Adapter.ExtraAdapterInfo → JSON: {"video_endpoint": "..."}
 func Builder(_ openrtb_ext.BidderName, adapterConfig config.Adapter, _ config.Server) (adapters.Bidder, error) {
 	info := extraInfo{}
 	if adapterConfig.ExtraAdapterInfo != "" {
 		if err := json.Unmarshal([]byte(adapterConfig.ExtraAdapterInfo), &info); err != nil {
-			return nil, fmt.Errorf("pubvive: failed to parse extra_info: %w", err)
+			return nil, fmt.Errorf("pubvibeXenon: failed to parse extra_info: %w", err)
 		}
 	}
 

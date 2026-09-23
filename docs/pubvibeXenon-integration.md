@@ -1,8 +1,8 @@
-# Pubvive Bid Adapter Integration
+# PubvibeXenon Bid Adapter Integration
 
 ## Overview
 
-This document describes the integration of the **pubvive** bid adapter into the Prebid Server (Go). The adapter connects to the [xenrtb.com](http://rtb.xenrtb.com) RTB endpoints for web banner and video ad serving.
+This document describes the integration of the **pubvibeXenon** bid adapter into the Prebid Server (Go). The adapter connects to the [xenrtb.com](http://rtb.xenrtb.com) RTB endpoints for web banner and video ad serving.
 
 ---
 
@@ -23,22 +23,22 @@ There is also a financial/reporting API (`http://api.xenrtb.com/ssp/financial/`)
 
 | File | Description |
 |------|-------------|
-| `adapters/pubvive/pubvive.go` | Core adapter logic |
-| `adapters/pubvive/pubvive_test.go` | JSON test runner |
-| `adapters/pubvive/params_test.go` | Bidder params schema validation tests |
-| `adapters/pubvive/pubvivetest/exemplary/simple-banner.json` | Test case: banner only |
-| `adapters/pubvive/pubvivetest/exemplary/simple-video.json` | Test case: video only |
-| `adapters/pubvive/pubvivetest/exemplary/banner-and-video.json` | Test case: both types in one request |
-| `static/bidder-info/pubvive.yaml` | Bidder metadata and endpoint config |
-| `static/bidder-params/pubvive.json` | JSON schema for bidder params (no required params) |
-| `openrtb_ext/imp_pubvive.go` | Imp-level ext type definition |
+| `adapters/pubvibeXenon/pubvibeXenon.go` | Core adapter logic |
+| `adapters/pubvibeXenon/pubvibeXenon_test.go` | JSON test runner |
+| `adapters/pubvibeXenon/params_test.go` | Bidder params schema validation tests |
+| `adapters/pubvibeXenon/pubvibeXenontest/exemplary/simple-banner.json` | Test case: banner only |
+| `adapters/pubvibeXenon/pubvibeXenontest/exemplary/simple-video.json` | Test case: video only |
+| `adapters/pubvibeXenon/pubvibeXenontest/exemplary/banner-and-video.json` | Test case: both types in one request |
+| `static/bidder-info/pubvibeXenon.yaml` | Bidder metadata and endpoint config |
+| `static/bidder-params/pubvibeXenon.json` | JSON schema for bidder params (no required params) |
+| `openrtb_ext/imp_pubvibeXenon.go` | Imp-level ext type definition |
 
 ### Modified Files
 
 | File | Change |
 |------|--------|
-| `openrtb_ext/bidders.go` | Added `BidderPubvive` to `coreBidderNames` slice and const block |
-| `exchange/adapter_builders.go` | Added `pubvive` import and `BidderPubvive: pubvive.Builder` mapping |
+| `openrtb_ext/bidders.go` | Added `BidderPubvibeXenon` to `coreBidderNames` slice and const block |
+| `exchange/adapter_builders.go` | Added `pubvibeXenon` import and `BidderPubvibeXenon: pubvibeXenon.Builder` mapping |
 
 ---
 
@@ -55,7 +55,7 @@ If a single bid request contains both banner and video impressions, **two separa
 
 ### Configuration
 
-The endpoints are stored in `static/bidder-info/pubvive.yaml`:
+The endpoints are stored in `static/bidder-info/pubvibeXenon.yaml`:
 
 ```yaml
 endpoint: "http://rtb.xenrtb.com/?pid=9d203cb398882b94a15db0aaf0c08470"
@@ -70,7 +70,7 @@ extra_info: '{"video_endpoint":"http://rtb.xenrtb.com/?pid=7d7a1a086cfa5105a4bde
 The adapter requires **no publisher-supplied parameters** in the impression ext. Publishers simply include:
 
 ```json
-"ext": { "prebid": { "bidder": { "pubvive": {} } } }
+"ext": { "prebid": { "bidder": { "pubvibeXenon": {} } } }
 ```
 
 ---
@@ -100,7 +100,7 @@ curl -X POST http://localhost:8000/openrtb2/auction \
       "banner": { "format": [{"w": 300, "h": 250}] },
       "bidfloor": 0.01,
       "bidfloorcur": "USD",
-      "ext": { "prebid": { "bidder": { "pubvive": {} } } }
+      "ext": { "prebid": { "bidder": { "pubvibeXenon": {} } } }
     }],
     "site": {
       "page": "https://yoursite.com/article",
@@ -132,7 +132,7 @@ curl -X POST http://localhost:8000/openrtb2/auction \
         "w": 640,
         "h": 480
       },
-      "ext": { "prebid": { "bidder": { "pubvive": {} } } }
+      "ext": { "prebid": { "bidder": { "pubvibeXenon": {} } } }
     }],
     "site": {
       "page": "https://yoursite.com/article",
@@ -152,7 +152,7 @@ All adapter tests pass:
 === RUN   TestValidParams   --- PASS
 === RUN   TestInvalidParams --- PASS
 === RUN   TestJsonSamples   --- PASS
-ok   github.com/prebid/prebid-server/v4/adapters/pubvive
+ok   github.com/prebid/prebid-server/v4/adapters/pubvibeXenon
 ```
 
 Full project build: clean (`go build ./...` — no errors).
@@ -199,7 +199,7 @@ Your Website (browser)
 Prebid Server (Go) ← this repo, running on your server
     │
     ▼
-xenrtb.com RTB endpoints (pubvive adapter)
+xenrtb.com RTB endpoints (pubvibeXenon adapter)
 ```
 
 ads.txt is already done. The remaining steps are below.
@@ -236,7 +236,7 @@ Download the generated `prebid.js` file and host it on your site (or use a CDN).
     pbjs.setConfig({
       s2sConfig: {
         accountId: '1',
-        bidders: ['pubvive'],
+        bidders: ['pubvibeXenon'],
         defaultVendor: 'appnexus',
         timeout: 1000,
         endpoint: {
@@ -254,7 +254,7 @@ Download the generated `prebid.js` file and host it on your site (or use a CDN).
           banner: { sizes: [[300, 250], [728, 90]] }
         },
         bids: [{
-          bidder: 'pubvive',
+          bidder: 'pubvibeXenon',
           params: {}
         }]
       },
@@ -271,7 +271,7 @@ Download the generated `prebid.js` file and host it on your site (or use a CDN).
           }
         },
         bids: [{
-          bidder: 'pubvive',
+          bidder: 'pubvibeXenon',
           params: {}
         }]
       }
@@ -389,7 +389,7 @@ bidsBackHandler: function() {
 |------|--------|
 | ads.txt | ✅ Done |
 | Prebid Server running locally | ✅ Done |
-| pubvive adapter integrated | ✅ Done |
+| pubvibeXenon adapter integrated | ✅ Done |
 | Build Prebid.js bundle | ⏸ Pending |
 | Add Prebid.js to site pages | ⏸ Pending |
 | Deploy Prebid Server to public host | ⏸ Pending |

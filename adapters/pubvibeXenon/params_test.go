@@ -1,4 +1,4 @@
-package pubvive
+package pubvibeXenon
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 
 const schemaDirectory = "../../static/bidder-params"
 
-// TestValidParams ensures the pubvive schema accepts valid params.
-// The pubvive adapter has no required params so an empty object is valid.
+// TestValidParams ensures the pubvibeXenon schema accepts valid params.
+// The pubvibeXenon adapter has no required params so an empty object is valid.
 func TestValidParams(t *testing.T) {
 	validator, err := openrtb_ext.NewBidderParamsValidator(schemaDirectory)
 	if err != nil {
@@ -18,13 +18,13 @@ func TestValidParams(t *testing.T) {
 	}
 
 	for _, p := range validParams {
-		if err := validator.Validate(openrtb_ext.BidderPubvive, json.RawMessage(p)); err != nil {
+		if err := validator.Validate(openrtb_ext.BidderPubvibeXenon, json.RawMessage(p)); err != nil {
 			t.Errorf("Schema should allow valid params: %s\n Error: %v", p, err)
 		}
 	}
 }
 
-// TestInvalidParams ensures the pubvive schema rejects invalid params.
+// TestInvalidParams ensures the pubvibeXenon schema rejects invalid params.
 func TestInvalidParams(t *testing.T) {
 	validator, err := openrtb_ext.NewBidderParamsValidator(schemaDirectory)
 	if err != nil {
@@ -32,7 +32,7 @@ func TestInvalidParams(t *testing.T) {
 	}
 
 	for _, p := range invalidParams {
-		if err := validator.Validate(openrtb_ext.BidderPubvive, json.RawMessage(p)); err == nil {
+		if err := validator.Validate(openrtb_ext.BidderPubvibeXenon, json.RawMessage(p)); err == nil {
 			t.Errorf("Schema should reject invalid params: %s", p)
 		}
 	}
