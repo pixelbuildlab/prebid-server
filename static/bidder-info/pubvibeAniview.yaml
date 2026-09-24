@@ -1,0 +1,15 @@
+endpoint: "https://rtb.aniview.com/sspRTB2?tagid=6aae3b475877fabb4000b596"
+extra_info: '{"banner_web_ms_endpoint":"https://rtb.aniview.com/sspRTB2?tagid=6aae3ba9df8f4d78430013d6","video_ia_endpoint":"https://rtb.aniview.com/sspRTB2?tagid=6aae3c03b9da07c777013436"}'
+maintainer:
+  email: support@aniview.com
+openrtb:
+  version: 2.6
+capabilities:
+  site:
+    mediaTypes:
+      - banner
+      - video
+  app:
+    mediaTypes:
+      - banner
+      - video

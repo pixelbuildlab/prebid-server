@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "pubvibeISCream Params",
+  "type": "object",
+  "properties": {
+    "mediatype": {
+      "type": "string",
+      "description": "Selects the ISCream endpoint: 'banner_ia' (Banner IA), 'banner_web_ms' (Banner Web MS), or 'video_ia' (Video IA). Defaults to banner_ia for banner and video_ia for video when omitted.",
+      "enum": ["banner_ia", "banner_web_ms", "video_ia"]
+    }
+  }
+}

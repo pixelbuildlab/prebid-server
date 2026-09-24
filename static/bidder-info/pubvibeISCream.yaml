@@ -1,0 +1,15 @@
+endpoint: "http://srv.agilityadvsrv.com/rtb/1931448329/2138715324"
+extra_info: '{"banner_web_ms_endpoint":"http://srv.agilityadvsrv.com/rtb/1931448329/1272911745","video_ia_endpoint":"http://srv.agilityadvsrv.com/rtb/1931448329/3367928980"}'
+maintainer:
+  email: support@iscream2.com
+openrtb:
+  version: 2.6
+capabilities:
+  site:
+    mediaTypes:
+      - banner
+      - video
+  app:
+    mediaTypes:
+      - banner
+      - video
