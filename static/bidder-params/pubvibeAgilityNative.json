@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "pubvibeAgilityNative Params",
+  "type": "object",
+  "properties": {
+    "mediatype": {
+      "type": "string",
+      "description": "Selects the AgilityNative endpoint: 'banner_web_ms' (Banner Web MS, default), 'banner_ia' (Banner IA), or 'native' (Native). When omitted, banner imps default to banner_web_ms and native imps default to native.",
+      "enum": ["banner_web_ms", "banner_ia", "native"]
+    }
+  }
+}

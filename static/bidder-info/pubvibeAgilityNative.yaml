@@ -1,0 +1,15 @@
+endpoint: "http://rtb-useast.agilitydigitalmedia.com/rtb?zone=413281"
+extra_info: '{"banner_ia_endpoint":"http://rtb-useast.agilitydigitalmedia.com/rtb?zone=413283","native_endpoint":"http://rtb-useast.agilitydigitalmedia.com/rtb?zone=413284"}'
+maintainer:
+  email: support@agilitydigitalmedia.com
+openrtb:
+  version: 2.6
+capabilities:
+  site:
+    mediaTypes:
+      - banner
+      - native
+  app:
+    mediaTypes:
+      - banner
+      - native

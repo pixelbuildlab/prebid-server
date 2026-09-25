@@ -1,7 +1,6 @@
 # Pubvibe Adapters — Prebid.js Integration Guide
 
 **For:** Prebid.js developer  
-**Site:** Your site (reference: jobsedutimes.com model)  
 **Server:** Prebid Server (Go) running your custom adapters  
 **Mode:** Server-to-Server (s2sConfig) only — all bidding goes through your Prebid Server  
 
@@ -9,23 +8,41 @@
 
 ## Adapters Available
 
-| Adapter Name | Provider | Banner IA | Banner Web MS | Video IA |
-|---|---|---|---|---|
-| `pubvibeXenon` | xenrtb.com | ✅ | ❌ | ✅ |
-| `pubvibeAniview` | aniview.com | ✅ | ✅ | ✅ |
-| `pubvibeISCream` | agilityadvsrv.com | ✅ | ✅ | ✅ |
+| Adapter Name | Provider | Banner Web MS | Banner IA | Native | Video IA |
+|---|---|---|---|---|---|
+| `pubvibeXenon` | xenrtb.com | ❌ | ✅ (auto, no param) | ❌ | ✅ (auto, no param) |
+| `pubvibeAniview` | aniview.com | ✅ | ✅ | ❌ | ✅ |
+| `pubvibeISCream` | agilityadvsrv.com | ✅ | ✅ | ❌ | ✅ |
+| `pubvibeAgilityNative` | agilitydigitalmedia.com | ✅ (default) | ✅ | ✅ | ❌ |
+
+> **Important for developers:** Always specify `mediatype` explicitly in your bid params for `pubvibeAniview`, `pubvibeISCream`, and `pubvibeAgilityNative`. For `pubvibeXenon`, never pass `mediatype` — use `params: {}` only.
+
+---
+
+## Mediatype Values Per Adapter
+
+> **Param key spelling:** The param is `mediatype` (all lowercase). Do NOT write `mediaType` (camelCase) — it will be ignored by the server and the default routing will apply.
+
+| Adapter | Banner Web MS | Banner IA | Native | Video IA | Default when `params: {}` |
+|---|---|---|---|---|---|
+| `pubvibeXenon` | ❌ not supported | ❌ no param needed — banner auto-routes | ❌ | ❌ no param needed — video auto-routes | banner imp → banner endpoint, video imp → video endpoint |
+| `pubvibeAniview` | `mediatype: 'banner_web_ms'` | `mediatype: 'banner_ia'` | ❌ | `mediatype: 'video_ia'` | banner imp → `banner_ia`, video imp → `video_ia` |
+| `pubvibeISCream` | `mediatype: 'banner_web_ms'` | `mediatype: 'banner_ia'` | ❌ | `mediatype: 'video_ia'` | banner imp → `banner_ia`, video imp → `video_ia` |
+| `pubvibeAgilityNative` | `mediatype: 'banner_web_ms'` | `mediatype: 'banner_ia'` | `mediatype: 'native'` | ❌ not supported | banner imp → `banner_web_ms`, native imp → `native` |
+
+**Rule of thumb:**
+- `pubvibeXenon` → always use `params: {}` (no mediatype needed or accepted)
+- All others → always specify `mediatype` explicitly to avoid ambiguity
 
 ---
 
 ## 1. Prebid Server s2sConfig (Required — set once)
 
-This connects Prebid.js to your Prebid Server. All three adapters route through it.
-
 ```javascript
 pbjs.setConfig({
   s2sConfig: {
     accountId: '1',
-    bidders: ['pubvibeXenon', 'pubvibeAniview', 'pubvibeISCream'],
+    bidders: ['pubvibeXenon', 'pubvibeAniview', 'pubvibeISCream', 'pubvibeAgilityNative'],
     defaultVendor: 'appnexus',
     timeout: 1500,
     endpoint: {
@@ -40,99 +57,10 @@ pbjs.setConfig({
 
 ---
 
-## 2. Bidder Parameters Reference
+## 2. Banner Web MS Ad Units
 
-### pubvibeXenon
-
-| Parameter | Type | Required | Values | Description |
-|---|---|---|---|---|
-| *(none)* | — | No | — | No params needed. Routing is handled server-side by impression type |
-
-Routing behavior (automatic, no params needed):
-- `imp.banner` → Banner endpoint
-- `imp.video` → Video endpoint
-
----
-
-### pubvibeAniview
-
-| Parameter | Type | Required | Values | Description |
-|---|---|---|---|---|
-| `mediatype` | string | No | `banner_ia`, `banner_web_ms`, `video_ia` | Selects which Aniview endpoint to use |
-
-Default routing when `mediatype` is omitted:
-- `imp.banner` → `banner_ia`
-- `imp.video` → `video_ia`
-
----
-
-### pubvibeISCream
-
-| Parameter | Type | Required | Values | Description |
-|---|---|---|---|---|
-| `mediatype` | string | No | `banner_ia`, `banner_web_ms`, `video_ia` | Selects which ISCream endpoint to use |
-
-Default routing when `mediatype` is omitted:
-- `imp.banner` → `banner_ia`
-- `imp.video` → `video_ia`
-
----
-
-## 3. Single Adapter Usage
-
-### pubvibeXenon — Banner only
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-banner-300x250',
-  mediaTypes: {
-    banner: { sizes: [[300, 250], [728, 90]] }
-  },
-  bids: [{
-    bidder: 'pubvibeXenon',
-    params: {}
-  }]
-}]);
-```
-
-### pubvibeXenon — Video only
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-video-unit',
-  mediaTypes: {
-    video: {
-      playerSize: [640, 480],
-      context: 'instream',
-      mimes: ['video/mp4'],
-      protocols: [1, 2, 5],
-      minduration: 5,
-      maxduration: 30
-    }
-  },
-  bids: [{
-    bidder: 'pubvibeXenon',
-    params: {}
-  }]
-}]);
-```
-
----
-
-### pubvibeAniview — Banner IA
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-banner-300x250',
-  mediaTypes: {
-    banner: { sizes: [[300, 250], [728, 90]] }
-  },
-  bids: [{
-    bidder: 'pubvibeAniview',
-    params: { mediatype: 'banner_ia' }
-  }]
-}]);
-```
+Banner Web MS is available on `pubvibeAniview`, `pubvibeISCream`, and `pubvibeAgilityNative`.
+**Always pass `mediatype: 'banner_web_ms'` explicitly.**
 
 ### pubvibeAniview — Banner Web MS
 
@@ -145,45 +73,6 @@ pbjs.addAdUnits([{
   bids: [{
     bidder: 'pubvibeAniview',
     params: { mediatype: 'banner_web_ms' }
-  }]
-}]);
-```
-
-### pubvibeAniview — Video IA
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-video-unit',
-  mediaTypes: {
-    video: {
-      playerSize: [640, 480],
-      context: 'instream',
-      mimes: ['video/mp4'],
-      protocols: [1, 2, 5],
-      minduration: 5,
-      maxduration: 30
-    }
-  },
-  bids: [{
-    bidder: 'pubvibeAniview',
-    params: { mediatype: 'video_ia' }
-  }]
-}]);
-```
-
----
-
-### pubvibeISCream — Banner IA
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-banner-300x250',
-  mediaTypes: {
-    banner: { sizes: [[300, 250], [728, 90]] }
-  },
-  bids: [{
-    bidder: 'pubvibeISCream',
-    params: { mediatype: 'banner_ia' }
   }]
 }]);
 ```
@@ -203,100 +92,156 @@ pbjs.addAdUnits([{
 }]);
 ```
 
-### pubvibeISCream — Video IA
+### pubvibeAgilityNative — Banner Web MS
 
 ```javascript
 pbjs.addAdUnits([{
-  code: 'div-video-unit',
+  code: 'div-banner-web-ms',
   mediaTypes: {
-    video: {
-      playerSize: [640, 480],
-      context: 'instream',
-      mimes: ['video/mp4'],
-      protocols: [1, 2, 5],
-      minduration: 5,
-      maxduration: 30
-    }
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [{
+    bidder: 'pubvibeAgilityNative',
+    params: { mediatype: 'banner_web_ms' }
+  }]
+}]);
+```
+
+### All Three Competing on Banner Web MS
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-web-ms',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [
+    { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_web_ms' } },
+    { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_web_ms' } },
+    { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_web_ms' } }
+  ]
+}]);
+```
+
+---
+
+## 3. Banner IA Ad Units
+
+Banner IA is available on `pubvibeXenon`, `pubvibeAniview`, `pubvibeISCream`, and `pubvibeAgilityNative`.
+
+### pubvibeXenon — Banner IA (automatic, no params needed)
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-ia',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [{
+    bidder: 'pubvibeXenon',
+    params: {}
+  }]
+}]);
+```
+
+### pubvibeAniview — Banner IA
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-ia',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [{
+    bidder: 'pubvibeAniview',
+    params: { mediatype: 'banner_ia' }
+  }]
+}]);
+```
+
+### pubvibeISCream — Banner IA
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-ia',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
   },
   bids: [{
     bidder: 'pubvibeISCream',
-    params: { mediatype: 'video_ia' }
+    params: { mediatype: 'banner_ia' }
+  }]
+}]);
+```
+
+### pubvibeAgilityNative — Banner IA
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-ia',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [{
+    bidder: 'pubvibeAgilityNative',
+    params: { mediatype: 'banner_ia' }
+  }]
+}]);
+```
+
+### All Four Competing on Banner IA
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-banner-ia',
+  mediaTypes: {
+    banner: { sizes: [[300, 250], [728, 90]] }
+  },
+  bids: [
+    { bidder: 'pubvibeXenon',         params: {} },
+    { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_ia' } },
+    { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_ia' } },
+    { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_ia' } }
+  ]
+}]);
+```
+
+---
+
+## 4. Native Ad Units
+
+Native is only available on `pubvibeAgilityNative`.
+**Always pass `mediatype: 'native'` explicitly.**
+
+```javascript
+pbjs.addAdUnits([{
+  code: 'div-native-unit',
+  mediaTypes: {
+    native: {
+      title:       { required: true, len: 80 },
+      image:       { required: true, sizes: [[300, 250]] },
+      sponsoredBy: { required: true },
+      body:        { required: false }
+    }
+  },
+  bids: [{
+    bidder: 'pubvibeAgilityNative',
+    params: { mediatype: 'native' }
   }]
 }]);
 ```
 
 ---
 
-## 4. Combined Usage — All 3 Adapters on One Site
+## 5. Video IA Ad Units
 
-This is the recommended setup for maximum fill and best CPM. All 3 adapters compete
-on the same ad unit. Prebid picks the highest bid.
+Video IA is available on `pubvibeXenon`, `pubvibeAniview`, and `pubvibeISCream`.
 
-### Banner Ad Unit — All 3 Adapters Competing
-
-```javascript
-pbjs.addAdUnits([{
-  code: 'div-banner-300x250',
-  mediaTypes: {
-    banner: { sizes: [[300, 250], [728, 90], [320, 50]] }
-  },
-  bids: [
-    // Xenon — no params needed
-    {
-      bidder: 'pubvibeXenon',
-      params: {}
-    },
-    // Aniview — Banner IA endpoint
-    {
-      bidder: 'pubvibeAniview',
-      params: { mediatype: 'banner_ia' }
-    },
-    // ISCream — Banner IA endpoint
-    {
-      bidder: 'pubvibeISCream',
-      params: { mediatype: 'banner_ia' }
-    }
-  ]
-}]);
-```
-
-### Banner Ad Unit — With Web MS variants competing too
-
-Use a second ad unit or duplicate bids with `banner_web_ms` to get more demand:
-
-```javascript
-pbjs.addAdUnits([
-  // Unit 1: Banner IA demand
-  {
-    code: 'div-banner-top',
-    mediaTypes: {
-      banner: { sizes: [[728, 90], [970, 90]] }
-    },
-    bids: [
-      { bidder: 'pubvibeXenon',   params: {} },
-      { bidder: 'pubvibeAniview', params: { mediatype: 'banner_ia' } },
-      { bidder: 'pubvibeISCream', params: { mediatype: 'banner_ia' } }
-    ]
-  },
-  // Unit 2: Banner Web MS demand (different inventory)
-  {
-    code: 'div-banner-mid',
-    mediaTypes: {
-      banner: { sizes: [[300, 250], [336, 280]] }
-    },
-    bids: [
-      { bidder: 'pubvibeAniview', params: { mediatype: 'banner_web_ms' } },
-      { bidder: 'pubvibeISCream', params: { mediatype: 'banner_web_ms' } }
-    ]
-  }
-]);
-```
-
-### Video Ad Unit — All 3 Adapters Competing
+### All Three Competing on Video IA
 
 ```javascript
 pbjs.addAdUnits([{
-  code: 'div-video-player',
+  code: 'div-video-instream',
   mediaTypes: {
     video: {
       playerSize: [640, 480],
@@ -321,10 +266,7 @@ pbjs.addAdUnits([{
 
 ---
 
-## 5. Full Page Setup — jobsedutimes.com Style
-
-A complete multi-slot setup similar to a news/jobs site with 6-8 demand sources
-across banner and video. All demand flows through your single Prebid Server.
+## 6. Full Page Setup — All Adapters
 
 ```javascript
 var pbjs = pbjs || {};
@@ -336,7 +278,7 @@ pbjs.que.push(function() {
   pbjs.setConfig({
     s2sConfig: {
       accountId: '1',
-      bidders: ['pubvibeXenon', 'pubvibeAniview', 'pubvibeISCream'],
+      bidders: ['pubvibeXenon', 'pubvibeAniview', 'pubvibeISCream', 'pubvibeAgilityNative'],
       defaultVendor: 'appnexus',
       timeout: 1500,
       endpoint: {
@@ -344,63 +286,81 @@ pbjs.que.push(function() {
         noConsent:  'https://YOUR_PREBID_SERVER_DOMAIN/openrtb2/auction'
       }
     },
-    // Price granularity — important for GAM line items
     priceGranularity: 'medium',
-    // Currency
     currency: { adServerCurrency: 'USD' }
   });
 
   // ── Step 2: Define all ad units ─────────────────────────────────────────
   pbjs.addAdUnits([
 
-    // --- Leaderboard (728x90) — top of page ---
+    // --- Leaderboard Banner IA — all 4 competing ---
     {
       code: 'div-leaderboard-728x90',
       mediaTypes: {
         banner: { sizes: [[728, 90], [970, 90]] }
       },
       bids: [
-        { bidder: 'pubvibeXenon',   params: {} },
-        { bidder: 'pubvibeAniview', params: { mediatype: 'banner_ia' } },
-        { bidder: 'pubvibeISCream', params: { mediatype: 'banner_ia' } }
+        { bidder: 'pubvibeXenon',         params: {} },
+        { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_ia' } }
       ]
     },
 
-    // --- Medium Rectangle (300x250) — sidebar/inline ---
+    // --- Medium Rectangle Banner IA ---
     {
       code: 'div-mrec-300x250',
       mediaTypes: {
         banner: { sizes: [[300, 250], [300, 600], [336, 280]] }
       },
       bids: [
-        { bidder: 'pubvibeXenon',   params: {} },
-        { bidder: 'pubvibeAniview', params: { mediatype: 'banner_ia' } },
-        { bidder: 'pubvibeISCream', params: { mediatype: 'banner_ia' } }
+        { bidder: 'pubvibeXenon',         params: {} },
+        { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_ia' } }
       ]
     },
 
-    // --- Mid-page Banner — Web MS demand (higher fill on content pages) ---
+    // --- Mid-page Banner Web MS — incremental fill ---
     {
-      code: 'div-mid-banner-300x250',
+      code: 'div-mid-banner-web-ms',
       mediaTypes: {
         banner: { sizes: [[300, 250], [320, 100]] }
       },
       bids: [
-        { bidder: 'pubvibeAniview', params: { mediatype: 'banner_web_ms' } },
-        { bidder: 'pubvibeISCream', params: { mediatype: 'banner_web_ms' } }
+        { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_web_ms' } },
+        { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_web_ms' } },
+        { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_web_ms' } }
       ]
     },
 
-    // --- Mobile Banner (320x50) ---
+    // --- Mobile Banner IA ---
     {
       code: 'div-mobile-320x50',
       mediaTypes: {
         banner: { sizes: [[320, 50], [300, 50]] }
       },
       bids: [
-        { bidder: 'pubvibeXenon',   params: {} },
-        { bidder: 'pubvibeAniview', params: { mediatype: 'banner_ia' } },
-        { bidder: 'pubvibeISCream', params: { mediatype: 'banner_ia' } }
+        { bidder: 'pubvibeXenon',         params: {} },
+        { bidder: 'pubvibeAniview',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeISCream',       params: { mediatype: 'banner_ia' } },
+        { bidder: 'pubvibeAgilityNative', params: { mediatype: 'banner_ia' } }
+      ]
+    },
+
+    // --- Native ---
+    {
+      code: 'div-native-unit',
+      mediaTypes: {
+        native: {
+          title:       { required: true, len: 80 },
+          image:       { required: true, sizes: [[300, 250]] },
+          sponsoredBy: { required: true },
+          body:        { required: false }
+        }
+      },
+      bids: [
+        { bidder: 'pubvibeAgilityNative', params: { mediatype: 'native' } }
       ]
     },
 
@@ -432,16 +392,12 @@ pbjs.que.push(function() {
 
   // ── Step 3: Request bids and pass to your ad server ────────────────────
   pbjs.requestBids({
-    bidsBackHandler: function(bids) {
-
+    bidsBackHandler: function() {
       // If using Google Ad Manager:
       googletag.cmd.push(function() {
         pbjs.setTargetingForGPTAsync();
         googletag.pubads().refresh();
       });
-
-      // If NOT using GAM — render directly:
-      // pbjs.renderAd(document, bids['div-mrec-300x250'].bids[0].adId);
     }
   });
 
@@ -450,9 +406,7 @@ pbjs.que.push(function() {
 
 ---
 
-## 6. HTML Slot Divs
-
-Place these in your page HTML where ads should appear:
+## 7. HTML Slot Divs
 
 ```html
 <!-- Leaderboard -->
@@ -465,9 +419,9 @@ Place these in your page HTML where ads should appear:
   <script>googletag.cmd.push(function(){ googletag.display('div-mrec-300x250'); });</script>
 </div>
 
-<!-- Mid-page Banner (Web MS) -->
-<div id="div-mid-banner-300x250">
-  <script>googletag.cmd.push(function(){ googletag.display('div-mid-banner-300x250'); });</script>
+<!-- Mid-page Banner Web MS -->
+<div id="div-mid-banner-web-ms">
+  <script>googletag.cmd.push(function(){ googletag.display('div-mid-banner-web-ms'); });</script>
 </div>
 
 <!-- Mobile Banner -->
@@ -475,28 +429,23 @@ Place these in your page HTML where ads should appear:
   <script>googletag.cmd.push(function(){ googletag.display('div-mobile-320x50'); });</script>
 </div>
 
+<!-- Native -->
+<div id="div-native-unit"></div>
+
 <!-- Video Player -->
 <div id="div-video-instream"></div>
 ```
 
 ---
 
-## 7. Quick Reference — mediatype Values per Adapter
+## 8. Notes for Developers
 
-| Adapter | Banner IA | Banner Web MS | Video IA |
-|---|---|---|---|
-| `pubvibeXenon` | automatic | ❌ not supported | automatic |
-| `pubvibeAniview` | `"banner_ia"` | `"banner_web_ms"` | `"video_ia"` |
-| `pubvibeISCream` | `"banner_ia"` | `"banner_web_ms"` | `"video_ia"` |
-
----
-
-## 8. Notes for Developer
-
-- **No client-side adapter files needed** — all three adapters live in Prebid Server. Prebid.js only needs the `prebidServer` module in the build.
-- **Prebid.js build** must include the module `modules/prebidServerBidAdapter`. No other custom modules needed for these three adapters.
-- **Timeout** — `1500ms` is recommended. ISCream and Aniview are RTB endpoints so they respond fast, but allow headroom.
-- **mediatype is optional** — if you omit it, the server auto-routes: banner imps go to Banner IA, video imps go to Video IA. Only specify it explicitly when you want the Web MS endpoint.
-- **Best CPM strategy** — put all 3 adapters on every banner unit with the same `mediatype`. They compete and Prebid picks the winner automatically.
-- **Web MS slots** — add `banner_web_ms` as a second bid on the same slot (or a separate mid-content slot) for incremental fill.
+- **Always specify `mediatype`** — do not rely on defaults unless you have confirmed the default matches the endpoint you want. The defaults differ per adapter (see table in section 2).
+- **Preferred default is `banner_web_ms`** — if you are unsure which to use for a banner slot, use `banner_web_ms` for `pubvibeAniview`, `pubvibeISCream`, and `pubvibeAgilityNative`.
+- **`pubvibeXenon` has no `mediatype` param** — it routes automatically: banner imps go to the banner endpoint, video imps go to the video endpoint. Pass `params: {}`.
+- **No client-side adapter files needed** — all four adapters live in Prebid Server. Prebid.js only needs the `prebidServerBidAdapter` module (`modules/prebidServerBidAdapter`) in the build.
+- **Native is exclusive to `pubvibeAgilityNative`** — the other three adapters do not support native.
+- **Video is not supported by `pubvibeAgilityNative`** — use `pubvibeXenon`, `pubvibeAniview`, or `pubvibeISCream` for video.
+- **Timeout** — `1500ms` is recommended for all adapters.
 - **Currency** — all bids return USD. No currency conversion needed.
+- **Best CPM strategy** — put all eligible adapters on every slot with the same `mediatype`. They compete and Prebid picks the highest bid automatically.

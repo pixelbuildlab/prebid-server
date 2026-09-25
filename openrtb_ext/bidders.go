@@ -51,6 +51,7 @@ var coreBidderNames []BidderName = []BidderName{
 	BidderAfront,
 	BidderAidem,
 	BidderAJA,
+	BidderPubvibeAgilityNative,
 	BidderPubvibeAniview,
 	BidderPubvibeISCream,
 	BidderAkcelo,
@@ -445,6 +446,7 @@ const (
 	BidderAlkimi            BidderName = "alkimi"
 	BidderAllianceGravity   BidderName = "alliance_gravity"
 	BidderAMX               BidderName = "amx"
+	BidderPubvibeAgilityNative BidderName = "pubvibeAgilityNative"
 	BidderPubvibeAniview    BidderName = "pubvibeAniview"
 	BidderPubvibeISCream    BidderName = "pubvibeISCream"
 	BidderApacdex           BidderName = "apacdex"
